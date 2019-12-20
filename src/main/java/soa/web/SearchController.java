@@ -1,5 +1,8 @@
 package soa.web;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,10 +26,13 @@ public class SearchController {
     return "index";
   }
 
-
+  // Añadido parametro max indicando el numero maximo de tweets por busqueda, por defecto 5
   @RequestMapping(value = "/search")
   @ResponseBody
-  public Object search(@RequestParam("q") String q) {
-    return producerTemplate.requestBodyAndHeader("direct:search", "", "CamelTwitterKeywords", q);
+  public Object search(@RequestParam("q") String q, @RequestParam(name = "max", defaultValue = "5") int max) {
+    Map<String, Object> cabeceras = new HashMap<String, Object>();
+    cabeceras.put("CamelTwitterKeywords", q);
+    cabeceras.put("CamelTwitterCount", max);
+    return producerTemplate.requestBodyAndHeaders("direct:search", "", cabeceras);
   }
 }
